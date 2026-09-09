@@ -1,0 +1,66 @@
+defaults:
+  - _self_
+  - augmentations: symmetric.yaml
+  - # wandb: disabled
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+# disable hydra outputs
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+    
+tensorboard:   
+  enabled: false
+  log_dir: "../tensorboard_logs"
+
+
+
+name: "core-${backbone.name}-${data.dataset}"
+method: "core"
+backbone:
+  name: "resnet18"
+method_kwargs:
+  proj_hidden_dim: 2048
+  proj_output_dim: 256
+  detection_hidden_dim: 512
+  num_classes: 10 # adjust based on your dataset
+  temperature: 0.1
+  lambda_global: 1.0
+momentum:
+  base_tau: 0.99
+  final_tau: 1.0
+data:
+  dataset: cifar10 # change here for cifar100
+  train_path: "./datasets"
+  val_path: "./datasets"
+  format: "image_folder"
+  num_workers: 0
+
+optimizer:
+  name: "lars"
+  batch_size: 256
+  lr: 0.3
+  classifier_lr: 0.1
+  weight_decay: 1e-6
+  kwargs:
+    clip_lr: True
+    eta: 0.02
+    exclude_bias_n_norm: True
+scheduler:
+  name: "warmup_cosine"
+checkpoint:
+  enabled: True
+  dir: "trained_models"
+  frequency: 1
+auto_resume:
+  enabled: True
+
+# overwrite PL stuff
+max_epochs: 1000
+devices: [0]
+sync_batchnorm: False
+accelerator: "gpu"
+strategy: "auto"
+precision: 16-mixed

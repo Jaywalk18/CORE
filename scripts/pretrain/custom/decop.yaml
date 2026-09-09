@@ -1,0 +1,74 @@
+# scripts\pretrain\custom\decop.yaml
+defaults:
+  - _self_
+  - augmentations: symmetric.yaml
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+# 在你的配置文件中
+tensorboard:
+  enabled: true
+  log_dir: ${checkpoint.dir}/tensorboard_logs
+
+# disable hydra outputs
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+
+# Add these configuration parameters to your yaml file
+visualization:
+  enabled: true
+  frequency: 1  # Save visualizations every N epochs
+  num_images: 4  # Number of images to visualize per generation
+  save_dir: $decop-detection_visualizations
+
+name: "decop-${backbone.name}-${data.dataset}"
+method: "decop"
+backbone:
+  name: "resnet50"
+method_kwargs:
+  proj_hidden_dim: 2048
+  proj_output_dim: 256
+  detection_hidden_dim: 512
+  temperature: 0.1
+  advanced_stage_epoch: 5
+  lambda_global: 1.0
+  lambda_local: 1.0
+momentum:
+  base_tau: 0.99
+  final_tau: 1.0
+data:
+  dataset: custom # change here for cifar100
+  train_path: "./datasets/imagenette2/train"
+  val_path: "./datasets/imagenette2/val"
+  format: "image_folder"
+  num_workers: 0
+  num_large_crops: 2
+  num_small_crops: 1
+
+optimizer:
+  name: "lars"
+  batch_size: 128
+  lr: 0.3
+  classifier_lr: 0.4
+  weight_decay: 3e-5
+  kwargs:
+    clip_lr: True
+    eta: 0.02
+    exclude_bias_n_norm: True
+scheduler:
+  name: "warmup_cosine"
+checkpoint:
+  enabled: True
+  dir: "trained_models"
+  frequency: 1
+auto_resume:
+  enabled: True
+
+# overwrite PL stuff
+max_epochs: 400
+devices: [0]
+sync_batchnorm: False
+accelerator: "gpu"
+strategy: "auto"
+precision: 16-mixed

@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: >-
+  If you use CORE in your research, please cite the accompanying paper.
+title: "Less is More: Minimal Components for Contrastive Learning Delivering Superior Accuracy and Efficiency"
+authors:
+  - family-names: Zhou
+    given-names: Tianjian
+    affiliation: "College of Systems Engineering, National University of Defense Technology"
+  - family-names: Li
+    given-names: Yishan
+    affiliation: "College of Systems Engineering, National University of Defense Technology"
+  - family-names: Zhan
+    given-names: Lixin
+    affiliation: "College of Systems Engineering, National University of Defense Technology"
+  - family-names: Jiang
+    given-names: Jie
+    affiliation: "College of Systems Engineering, National University of Defense Technology"
+doi: 10.1109/TNNLS.2026.3726311
+version: 1.0.0
+date-released: "2026-09-07"
+repository-code: "https://github.com/Jaywalk18/CORE"
+keywords:
+  - contrastive learning
+  - self-supervised learning
+  - representation learning
+  - IEEE TNNLS

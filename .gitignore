@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Environments
+.env
+.venv
+env/
+venv/
+
+# Experiment tracking outputs
+wandb/
+swanlab/
+lightning_logs/
+logs/
+
+# Checkpoints and data
+checkpoints/
+*.ckpt
+*.pth
+*.tar.gz
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

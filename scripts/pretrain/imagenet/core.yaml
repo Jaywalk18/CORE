@@ -1,0 +1,68 @@
+defaults:
+  - _self_
+  - augmentations: symmetric.yaml
+  - # wandb: disabled
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+# disable hydra outputs
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+    
+tensorboard:   
+  enabled: false
+  log_dir: "../tensorboard_logs"
+
+name: "${method}-${backbone.name}-${data.dataset}-${method_kwargs.use_momentum_encoder}"
+
+
+method: "core"
+backbone:
+  name: "resnet50"
+  cifar: true 
+  zero_init_residual: false
+method_kwargs:
+  use_momentum_encoder: False
+  proj_hidden_dim: 4096
+  proj_output_dim: 256
+  temperature: 0.2
+momentum:
+  base_tau: 0.99
+  final_tau: 1.0
+data:
+  dataset: imagenet 
+  train_path: "./datasets/train"
+  val_path: "./datasets/val"
+  format: "image_folder"
+  num_workers: 8
+
+optimizer:
+  name: "sgd"
+  batch_size: 128
+  lr: 0.45  
+  classifier_lr: 0.2
+  weight_decay: 1e-6
+  kwargs:
+    momentum: 0.9  
+scheduler:
+  name: "warmup_cosine"
+  warmup_epochs: 10            
+  warmup_start_lr: 0.003      
+  min_lr: 0    
+  
+checkpoint:
+  enabled: True
+  dir: "trained_models"
+  frequency: 1
+auto_resume:
+  enabled: True
+
+# overwrite PL stuff
+max_epochs: 100
+devices: [0,1]
+sync_batchnorm: false
+accelerator: "gpu"
+strategy: "ddp"
+precision: 16-mixed

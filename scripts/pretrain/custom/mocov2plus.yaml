@@ -1,0 +1,57 @@
+defaults:
+  - _self_
+  - augmentations: symmetric.yaml
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+# disable hydra outputs
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+
+# 在你的配置文件中
+tensorboard:
+  enabled: true
+  log_dir: ${checkpoint.dir}/tensorboard_logs
+
+name: "mocov2plus-imagenet"
+method: "mocov2plus"
+backbone:
+  name: "resnet50"
+method_kwargs:
+  proj_hidden_dim: 2048
+  proj_output_dim: 256
+  queue_size: 65536
+  temperature: 0.2
+momentum:
+  base_tau: 0.99
+  final_tau: 0.999
+data:
+  dataset: custom
+  train_path: "./datasets/imagenette2/train"
+  val_path: "./datasets/imagenette2/val"
+  format: "image_folder"
+  num_workers: 0
+optimizer:
+  name: "sgd"
+  batch_size: 128
+  lr: 0.3
+  classifier_lr: 0.4
+  weight_decay: 3e-5
+scheduler:
+  name: "warmup_cosine"
+checkpoint:
+  enabled: True
+  dir: "trained_models"
+  frequency: 1
+auto_resume:
+  enabled: True
+
+# overwrite PL stuff
+max_epochs: 400
+devices: [0]
+sync_batchnorm: True
+accelerator: "gpu"
+strategy: "auto"
+precision: 16-mixed

@@ -1,0 +1,76 @@
+# objcon.yaml - 修复版本
+defaults:
+  - _self_
+  - augmentations: myasymmetric.yaml
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+# disable hydra outputs
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+
+name: "objcon-custom-dataset"
+method: "objcon"
+backbone:
+  name: "resnet18"
+
+# ObjCon特定参数修复
+proj_hidden_dim: 2048
+proj_output_dim: 2048
+pred_hidden_dim: 512
+edge_detection_stage: True
+semantic_stage: False
+lambda_global: 1.0
+lambda_local: 0.5
+detection_pretrained: True
+det_model_type: "faster_rcnn"
+
+momentum:
+  base_tau: 0.99
+  final_tau: 1.0
+
+data:
+  dataset: "custom"
+  train_path: "PATH_TO_TRAIN_DIR"
+  val_path: "PATH_TO_VAL_DIR"
+  format: "dali"
+  num_workers: 4
+  no_labels: False
+
+optimizer:
+  name: "lars"
+  batch_size: 128
+  lr: 0.3
+  classifier_lr: 0.3
+  weight_decay: 1e-6
+  kwargs:
+    clip_lr: True
+    eta: 0.02
+    exclude_bias_n_norm: True
+
+scheduler:
+  name: "warmup_cosine"
+
+checkpoint:
+  enabled: True
+  dir: "trained_models"
+  frequency: 1
+
+auto_resume:
+  enabled: True
+
+# overwrite PL stuff
+max_epochs: 400
+devices: [0, 1, 2, 3]
+sync_batchnorm: True
+accelerator: "gpu"
+strategy: "ddp"
+precision: "16-mixed"
+
+# wandb logging
+wandb:
+  enabled: True
+  project: "objcon"
+  offline: False
